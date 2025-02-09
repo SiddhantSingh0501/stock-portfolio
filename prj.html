@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Stock Portfolio Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stock Portfolio Tracker</h1>
+        </header>
+
+        <!-- News Articles Section -->
+        <div class="market-news">
+            <h2>Market News</h2>
+            <div class="news-grid" id="newsContainer">
+                <!-- News items will be dynamically inserted here -->
+                <div class="loading-indicator">Loading market news...</div>
+            </div>
+        </div>
+
+        <!-- Stock Grid Section -->
+        <section class="stocks-grid-section">
+            <h2>Market Overview</h2>
+            <div class="stocks-grid" id="stocksGrid">
+                <!-- Stock boxes will be dynamically added here -->
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section class="portfolio-section">
+            <h2>Your Portfolio</h2>
+            <div class="add-stock-form">
+                <input type="text" id="stockSymbol" placeholder="Enter stock symbol (e.g., AAPL)">
+                <input type="number" id="stockQuantity" placeholder="Enter quantity">
+                <button id="addStock">Add Stock</button>
+            </div>
+            
+            <div class="stock-list">
+                <table id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Quantity</th>
+                            <th>Current Price</th>
+                            <th>Total Value</th>
+                            <th>Daily Change</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <!-- Stock rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="portfolio-summary">
+                <h3>Total Portfolio Value: <span id="totalPortfolioValue">$0.00</span></h3>
+                <h3>Daily Change: <span id="dailyChange">0.00%</span></h3>
+            </div>
+        </section>
+
+
+        <section class="charts">
+            <div class="time-filters">
+                <div class="time-filter active" data-time="day">1D</div>
+                <div class="time-filter" data-time="week">1W</div>
+                <div class="time-filter" data-time="month">1M</div>
+                <div class="time-filter" data-time="year">1Y</div>
+                <div class="time-filter" data-time="5year">5Y</div>
+                <div class="time-filter" data-time="all">ALL</div>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </section>
+
+        <div class="market-overview">
+            <div class="overview-header">
+                <h2>Market Overview</h2>
+                <div class="market-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Market Value</span>
+                        <span class="stat-value" id="totalMarketValue">$0.00</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Today's Change</span>
+                        <span class="stat-value" id="totalMarketChange">0.00%</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Active Stocks</span>
+                        <span class="stat-value" id="activeStocks">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add this in your header/navigation area -->
+        <div class="auth-section">
+            <button id="signInBtn" class="sign-in-btn">Sign In</button>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <span>Hi, <span id="userName"></span></span>
+                <button id="signOutBtn" class="sign-out-btn">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Add this modal/popup HTML at the end of your body tag -->
+    <div id="signInModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Sign In</h2>
+            <form id="signInForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required placeholder="Enter your email">
+                    <span id="emailError" class="error-message"></span>
+                </div>
+                <button type="submit" class="submit-btn">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    // Function to save portfolio to local storage
+    function savePortfolio() {
+        const stockData = []; // Collect stock data from the table
+        const rows = document.querySelectorAll('#stockTableBody tr');
+        rows.forEach(row => {
+            const stock = {
+                symbol: row.cells[0].innerText,
+                quantity: row.cells[1].innerText,
+                currentPrice: row.cells[2].innerText,
+                totalValue: row.cells[3].innerText,
+                dailyChange: row.cells[4].innerText
+            };
+            stockData.push(stock);
+        });
+        localStorage.setItem('portfolio', JSON.stringify(stockData));
+    }
+
+    // Function to load portfolio from local storage
+    function loadPortfolio() {
+        const stockData = JSON.parse(localStorage.getItem('portfolio'));
+        if (stockData) {
+            stockData.forEach(stock => {
+                // Code to add stock to the table
+                addStockToTable(stock); // Assuming you have a function to add stock to the table
+            });
+        }
+    }
+
+    // Call loadPortfolio on page load
+    window.onload = loadPortfolio;
+    </script>
+
+    <canvas id="marketChart" width="400" height="200"></canvas>
+</body>
+</html>
